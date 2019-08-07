@@ -1,0 +1,17 @@
+sendgrid.env
+build
+out
+.idea
+*.iml
+*.ipr
+*.iws
+*.json
+*.txt
+*.jpg
+*.swp
+.DS_Store
+.gradle
+sendgrid.env
+src/main/resources/public/
+gcp.yaml
+
