@@ -67,10 +67,9 @@ public class Application {
 
         System.out.println("Trying the google cloud vision api");
         try {
-            //detectDocumentsGcs("gs://egiftcard-source/egiftcard1-tosri.pdf", "gs://egiftcard-destination/response/");
-            //detectDocumentTextGcs("gs://egiftcard-source/sample-img.jpg", new PrintStream("/Users/mansubh/projects/visiongoogle/result.txt"));
-            Vision.detectText("/Users/mansubh/projects/visiongoogle/simple.jpg", new PrintStream("/Users/mansubh/projects/visiongoogle/result1.txt"));
-            //Vision.detectProperties("/Users/mansubh/projects/visiongoogle/sample-img-logo.jpg", new PrintStream("/Users/mansubh/projects/visiongoogle/result3.txt"));
+            Vision.detectDocumentsGcs("gs://simple-pdf-soruce/pdf-test.pdf","gs://simple-pdf-destination/response/");
+            //Vision.detectText("/Users/mansubh/projects/visiongoogle/simple.jpg", new PrintStream("/Users/mansubh/projects/visiongoogle/result1.txt"));
+
         }catch (Exception e){
             System.out.println("Exception -> "+ e.getMessage());
         }

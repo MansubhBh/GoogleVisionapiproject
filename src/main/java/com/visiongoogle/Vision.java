@@ -20,16 +20,7 @@ import java.util.regex.Pattern;
 
 public class Vision {
 
-    /**
-     * Detects logos in the specified local image.
-     *
-     * @param filePath The path to the local file to perform logo detection on.
-     * @param out A {@link PrintStream} to write detected logos to.
-     * @throws Exception on errors while closing the client.
-     * @throws IOException on Input/Output errors.
-     */
     // [START vision_logo_detection]
-
     public static void detectLogos(String filePath, PrintStream out) throws Exception, IOException {
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
@@ -90,16 +81,6 @@ public class Vision {
     }
 
 
-
-    /**
-     * Detects image properties such as color frequency from the specified local image.
-     *
-     * @param filePath The path to the file to detect properties.
-     * @param out A {@link PrintStream} to write
-     * @throws Exception on errors while closing the client.
-     * @throws IOException on Input/Output errors.
-     */
-    // [START vision_image_property_detection]
     public static void detectProperties(String filePath, PrintStream out) throws Exception,
             IOException {
         List<AnnotateImageRequest> requests = new ArrayList<>();
@@ -136,16 +117,6 @@ public class Vision {
         }
     }
 
-    /**
-     * Performs document text OCR with PDF/TIFF as source files on Google Cloud Storage.
-     *
-     * @param gcsSourcePath The path to the remote file on Google Cloud Storage to detect document
-     *                      text on.
-     * @param gcsDestinationPath The path to the remote file on Google Cloud Storage to store the
-     *                           results on.
-     * @throws Exception on errors while closing the client.
-     */
-
     public static void detectDocumentsGcs(String gcsSourcePath, String gcsDestinationPath) throws Exception {
 
         try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
@@ -156,8 +127,6 @@ public class Vision {
                     .setUri(gcsSourcePath)
                     .build();
 
-            // Create the configuration with the specified MIME (Multipurpose Internet Mail Extensions)
-            // types
             InputConfig inputConfig = InputConfig.newBuilder()
                     .setMimeType("application/pdf") // Supported MimeTypes: "application/pdf", "image/tiff"
                     .setGcsSource(gcsSource)
@@ -168,8 +137,6 @@ public class Vision {
                     .setUri(gcsDestinationPath)
                     .build();
 
-            // Create the configuration for the output with the batch size.
-            // The batch size sets how many pages should be grouped into each json output file.
             OutputConfig outputConfig = OutputConfig.newBuilder()
                     .setBatchSize(2)
                     .setGcsDestination(gcsDestination)
@@ -184,7 +151,6 @@ public class Vision {
                     .setInputConfig(inputConfig)
                     .setOutputConfig(outputConfig)
                     .build();
-
             requests.add(request);
 
             // Perform the OCR request
@@ -197,9 +163,6 @@ public class Vision {
             // the specified location on GCS.)
             List<AsyncAnnotateFileResponse> result = response.get(180, TimeUnit.SECONDS)
                     .getResponsesList();
-
-            // Once the request has completed and the output has been
-            // written to GCS, we can list all the output files.
             Storage storage = StorageOptions.getDefaultInstance().getService();
 
             // Get the destination location from the gcsDestinationPath
@@ -220,19 +183,10 @@ public class Vision {
                 System.out.println("Output files:");
                 for (Blob blob : pageList.iterateAll()) {
                     System.out.println(blob.getName());
-
-                    // Process the first output file from GCS.
-                    // Since we specified batch size = 2, the first response contains
-                    // the first two pages of the input file.
                     if (firstOutputFile == null) {
                         firstOutputFile = blob;
                     }
                 }
-
-                // Get the contents of the file and convert the JSON contents to an AnnotateFileResponse
-                // object. If the Blob is small read all its content in one request
-                // (Note: the file is a .json file)
-                // Storage guide: https://cloud.google.com/storage/docs/downloading-objects
                 String jsonContents = new String(firstOutputFile.getContent());
                 AnnotateFileResponse.Builder builder = AnnotateFileResponse.newBuilder();
                 JsonFormat.parser().merge(jsonContents, builder);
@@ -242,18 +196,12 @@ public class Vision {
 
                 // Parse through the object to get the actual response for the first page of the input file.
                 AnnotateImageResponse annotateImageResponse = annotateFileResponse.getResponses(0);
-
-                // Here we print the full text from the first page.
-                // The response contains more information:
-                // annotation/pages/blocks/paragraphs/words/symbols
-                // including confidence score and bounding boxes
                 System.out.format("\nText: %s\n", annotateImageResponse.getFullTextAnnotation().getText());
             } else {
                 System.out.println("No MATCH");
             }
         }
     }
-
 
 
 }
